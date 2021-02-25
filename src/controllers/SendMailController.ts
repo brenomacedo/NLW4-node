@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
-import { getCustomRepository } from "typeorm";
-import SurveyRepository from "../repositories/SurveyRepository";
-import SurveyUserRepository from "../repositories/SurveyUserRepository";
-import UserRepository from "../repositories/UserRepository";
-import SendMailService from "../services/SendMailService";
+import { Request, Response } from "express"
+import { getCustomRepository } from "typeorm"
+import { resolve } from 'path'
+import SurveyRepository from "../repositories/SurveyRepository"
+import SurveyUserRepository from "../repositories/SurveyUserRepository"
+import UserRepository from "../repositories/UserRepository"
+import SendMailService from "../services/SendMailService"
 
 export default {
     async execute(req: Request, res: Response) {
@@ -26,6 +27,30 @@ export default {
             return res.status(500).json({ msg: 'Survey does not exist!' })
         }
 
+        const surveyUserAlreadyExist = await surveysUsersRepository.findOne({
+            where: [
+                {user_id: userAlreadyExists.id}, {value: null}
+            ],
+            relations: ['user', 'survey']
+        })
+
+        const { title, description } = surveyAlreadyExists
+
+        const variables = {
+            name: userAlreadyExists.name,
+            title,
+            description,
+            user_id: userAlreadyExists.id,
+            link: process.env.URL_MAIL
+        }
+        
+        const npsPath = resolve(__dirname, '..', 'views', 'email', 'NPSMail.hbs')
+
+        if(surveyUserAlreadyExist) {
+            await SendMailService.execute(email, title, variables, npsPath)
+            return res.json(surveyUserAlreadyExist)
+        }
+
         const surveyUser = surveysUsersRepository.create({
             user_id: userAlreadyExists.id,
             survey_id
@@ -33,9 +58,9 @@ export default {
 
         await surveysUsersRepository.save(surveyUser)
 
-        const { title, description } = surveyAlreadyExists
 
-        await SendMailService.execute(email, title, description)
+
+        await SendMailService.execute(email, title, variables, npsPath)
 
         return res.json(surveyUser)
     }
