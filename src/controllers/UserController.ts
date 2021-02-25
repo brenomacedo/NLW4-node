@@ -1,13 +1,13 @@
 import { Request, Response } from "express"
-import { getRepository } from "typeorm"
-import User from "../models/User"
+import { getCustomRepository } from "typeorm"
+import UserRepository from "../repositories/UserRepository"
 
 export default {
     async create(req: Request, res: Response) {
 
         const { name, email } = req.body
 
-        const userRepository = getRepository(User)
+        const userRepository = getCustomRepository(UserRepository)
         
         const userExists = await userRepository.findOne({
             email
@@ -27,5 +27,9 @@ export default {
 
         return res.status(201).json(user)
 
+    },
+
+    async show(req: Request, res: Response) {
+        
     }
 }

@@ -1,9 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from "typeorm"
 import { v4 as uuid } from 'uuid'
 
-@Entity('users')
-class User {
-
+@Entity('surveys')
+class Survey {
     constructor() {
         if(!this.id) {
             this.id = uuid()
@@ -14,14 +13,13 @@ class User {
     id: string
 
     @Column()
-    name: string
+    title: string
 
     @Column()
-    email: string
+    description: string
 
     @CreateDateColumn()
     createdAt: Date
-
 }
 
-export default User
+export default Survey
