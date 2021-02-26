@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { getCustomRepository } from "typeorm"
 import UserRepository from "../repositories/UserRepository"
 import * as yup from 'yup'
+import AppError from "../errors/AppError"
 
 export default {
     async create(req: Request, res: Response) {
@@ -18,9 +19,7 @@ export default {
                 abortEarly: false
             })
         } catch (e) {
-            return res.status(400).json({
-                error: e.errors
-            })
+            throw new AppError("Validation error")
         }
 
         const userRepository = getCustomRepository(UserRepository)
@@ -30,9 +29,7 @@ export default {
         })
 
         if(userExists) {
-            return res.status(500).json({
-                error: "Usuário já existe!"
-            })
+            throw new AppError('User already exists!')
         }
 
         const user = userRepository.create({

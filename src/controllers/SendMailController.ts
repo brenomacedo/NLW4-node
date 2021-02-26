@@ -5,6 +5,7 @@ import SurveyRepository from "../repositories/SurveyRepository"
 import SurveyUserRepository from "../repositories/SurveyUserRepository"
 import UserRepository from "../repositories/UserRepository"
 import SendMailService from "../services/SendMailService"
+import AppError from "../errors/AppError"
 
 export default {
     async execute(req: Request, res: Response) {
@@ -18,13 +19,13 @@ export default {
         const userAlreadyExists = await usersRepository.findOne({ email })
 
         if(!userAlreadyExists) {
-            return res.status(500).json({ msg: 'User does not exist!' })
+            throw new AppError('Survey User does not exist!')
         }
 
         const surveyAlreadyExists = await surveysRepository.findOne(survey_id)
 
         if(!surveyAlreadyExists) {
-            return res.status(500).json({ msg: 'Survey does not exist!' })
+            throw new AppError('Survey User does not exist!')
         }
 
         const surveyUserAlreadyExist = await surveysUsersRepository.findOne({

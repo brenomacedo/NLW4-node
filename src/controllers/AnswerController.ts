@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import { getCustomRepository } from "typeorm"
+import AppError from "../errors/AppError"
 import SurveyUserRepository from "../repositories/SurveyUserRepository"
 
 export default {
@@ -14,7 +15,7 @@ export default {
         })
 
         if(!surveyUser) {
-            return res.status(400).json({ msg: "Survey User does not exist!" })
+            throw new AppError('SurveyUser does not exist!')
         }
 
         surveyUser.value = Number(value)
