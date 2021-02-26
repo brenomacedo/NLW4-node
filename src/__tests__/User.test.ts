@@ -7,7 +7,12 @@ describe('Users', () => {
     beforeAll(async () => {
         const connection = await createConnection()
         await connection.runMigrations()
-        
+    })
+
+    afterAll(async () => {
+        const connection = await createConnection()
+        await connection.dropDatabase()
+        await connection.close()
     })
 
     it("should create a new user", async () => {
